@@ -1,17 +1,19 @@
 import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Resolver, Mutation, Query, Args, Context } from '@nestjs/graphql';
 import { promisify } from 'util';
+
+import { LocalAuthGuard, AuthenticatedGuard } from 'src/guards';
+import { CurrentUser } from 'src/decorators';
 import { UserDTO } from '../user/user.dto';
 import { AuthService } from './auth.service';
 import { LoginInputDTO } from './dto/login-input.dto';
-import { LocalAuthGuard } from './local-auth.guard';
-import { CurrentUser } from './current-user.decorator';
 import { AuthenticatedUser } from './auth.interfaces';
 
 @Resolver()
 export class AuthResolver {
   constructor(private authService: AuthService) {}
 
+  @UseGuards(LocalAuthGuard)
   @Mutation((returns) => Boolean)
   async login(
     @Context('req') req,
@@ -30,7 +32,7 @@ export class AuthResolver {
     return true;
   }
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(AuthenticatedGuard)
   @Query(() => UserDTO)
   me(@CurrentUser() user: AuthenticatedUser): Promise<UserDTO> {
     return this.authService.currentUser(user);

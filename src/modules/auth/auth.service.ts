@@ -12,12 +12,10 @@ export class AuthService {
     const user = await this.userService.findOne(username);
     if (user && user.password === pass) {
       /**
-       * key point: return user with property username and password
-       * The returned user will be used in validate method of strategy and finally used in session generate.
-       * The session will be used to retrieve user in the subsequent quests need authentication.
-       * The retrieved user need property username and password which required by passport-local strategy.
+       * key point: erase password from user.
        */
-      return user;
+      const { password, ...result } = user;
+      return result;
     }
     return null;
   }

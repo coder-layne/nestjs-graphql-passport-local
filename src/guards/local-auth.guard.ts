@@ -6,13 +6,13 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 export class LocalAuthGuard extends AuthGuard('local') {
   getRequest(context: ExecutionContext): unknown {
     const ctx = GqlExecutionContext.create(context);
-    const req = ctx.getContext().req;
+    const request = ctx.getContext().req;
     /**
-     * key point: assign user to req.body
+     * key point: assign input args to req.body
      * passport-local strategy lookup username/password from req.body or req.query
      * https://github.com/jaredhanson/passport-local/blob/master/lib/strategy.js#L71-L72
      */
-    req.body = req.user;
-    return req;
+    request.body = ctx.getArgs().input;
+    return request;
   }
 }
